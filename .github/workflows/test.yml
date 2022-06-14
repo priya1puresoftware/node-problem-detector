@@ -1,0 +1,96 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - 'ubuntu-20.04'
+        go: 1.16
+        arch:
+          - 'x86_64'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up go 1.16
+      uses: actions/setup-python@v2
+      with:
+        go: 1.16
+        
+    - name: Install Dependencies
+      run: |
+                sudo apt-get update && sudo apt-get -y install curl git
+                sudo ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && export DEBIAN_FRONTEND=noninteractive && sudo apt-get install -y tzdata && sudo dpkg-reconfigure --frontend noninteractive tzdata
+                sudo apt-get -y install software-properties-common && sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt-get -y update
+                uname -m
+                sudo apt-get -y install make
+                sudo apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config
+                sudo apt-get install docker.io
+                sudo apt-get -qq update
+                sudo apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu
+                mkdir -p $HOME/gopath/src/k8s.io
+                mv $TRAVIS_BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector
+                cd $HOME/gopath/src/k8s.io/node-problem-detector
+                make
+                make test
+                make clean && BUILD_TAGS="disable_custom_plugin_monitor" make
+                BUILD_TAGS="disable_custom_plugin_monitor" make test
+                make clean && BUILD_TAGS="disable_system_log_monitor" make
+                BUILD_TAGS="disable_system_log_monitor" make test
+                make clean && BUILD_TAGS="disable_system_stats_monitor" make
+                BUILD_TAGS="disable_system_stats_monitor" make test
+                make clean && BUILD_TAGS="disable_stackdriver_exporter" make
+                BUILD_TAGS="disable_stackdriver_exporter" make test
+                make clean && ENABLE_JOURNALD=0 make
+                ENABLE_JOURNALD=0 make test
+                ENABLE_JOURNALD=0 make build-binaries
+                ENABLE_JOURNALD=1 docker build -t avi:latest .
+                
+
+  test_arm64: 
+     runs-on: ubuntu-latest
+     strategy:
+      matrix:
+        go: [1.16]
+      fail-fast: false
+     steps:
+      - uses: actions/checkout@v2
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+      - name: Install and Run tests
+        run: |
+               docker run --rm -v ${{ github.workspace }}:/ws:rw --workdir=/ws \
+               arm64v8/ubuntu:20.04 \
+               bash -exc 'apt-get update && apt-get -y install python3.8 curl git && \
+                ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata && dpkg-reconfigure --frontend noninteractive tzdata && \
+                apt-get -y install software-properties-common && add-apt-repository ppa:deadsnakes/ppa && apt-get -y update  && \           
+                uname -m && \
+                apt-get -y install make && \
+                apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config && \
+                apt-get -y install make && \
+                apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config && \
+                apt-get install docker.io && \
+                apt-get -qq update && \
+                apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu && \
+                mkdir -p $HOME/gopath/src/k8s.io && \
+                mv $TRAVIS_BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector && \
+                cd $HOME/gopath/src/k8s.io/node-problem-detector && \
+                make && \
+                make test && \
+                make clean && BUILD_TAGS="disable_custom_plugin_monitor" make && \
+                BUILD_TAGS="disable_custom_plugin_monitor" make test && \
+                make clean && BUILD_TAGS="disable_system_log_monitor" make && \
+                BUILD_TAGS="disable_system_log_monitor" make test && \
+                make clean && BUILD_TAGS="disable_system_stats_monitor" make && \
+                BUILD_TAGS="disable_system_stats_monitor" make test && \
+                make clean && BUILD_TAGS="disable_stackdriver_exporter" make && \
+                BUILD_TAGS="disable_stackdriver_exporter" make test && \
+                make clean && ENABLE_JOURNALD=0 make && \
+                ENABLE_JOURNALD=0 make test && \
+                ENABLE_JOURNALD=0 make build-binaries && \
+                ENABLE_JOURNALD=1 docker build -t avi:latest . && \
+                deactivate'
