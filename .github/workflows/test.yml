@@ -30,6 +30,9 @@ jobs:
                 sudo apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config
                 sudo apt-get -qq update
                 sudo apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu
+                mkdir -p $HOME/gopath/src/k8s.io
+                mv $BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector
+                cd $HOME/gopath/src/k8s.io/node-problem-detector
                 make
                 make test
                 make clean && BUILD_TAGS="disable_custom_plugin_monitor" make
@@ -68,6 +71,9 @@ jobs:
                 apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config && \
                 apt-get -y install docker.io && \
                 apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu && \
+                mkdir -p $HOME/gopath/src/k8s.io && \
+                mv $BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector && \
+                cd $HOME/gopath/src/k8s.io/node-problem-detector && \
                 make && \
                 make test && \
                 make clean && BUILD_TAGS="disable_custom_plugin_monitor" make && \
