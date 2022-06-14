@@ -25,11 +25,9 @@ jobs:
       run: |
                 sudo apt-get update && sudo apt-get -y install curl git
                 sudo ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && export DEBIAN_FRONTEND=noninteractive && sudo apt-get install -y tzdata && sudo dpkg-reconfigure --frontend noninteractive tzdata
-                sudo apt-get -y install software-properties-common && sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt-get -y update
                 uname -m
                 sudo apt-get -y install make
                 sudo apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config
-                sudo apt-get install docker.io
                 sudo apt-get -qq update
                 sudo apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu
                 mkdir -p $HOME/gopath/src/k8s.io
