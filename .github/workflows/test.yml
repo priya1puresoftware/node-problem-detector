@@ -31,7 +31,7 @@ jobs:
                 sudo apt-get -qq update
                 sudo apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu
                 mkdir -p $HOME/gopath/src/k8s.io
-                mv -v $BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector
+                mv -v $BUILD_DIR $HOME/gopath/src/k8s.io /node-problem-detector
                 cd $HOME/gopath/src/k8s.io/node-problem-detector
                 make
                 make test
