@@ -69,8 +69,7 @@ jobs:
                 uname -m && \
                 apt-get -y install make && \
                 apt-get -y install autoconf automake build-essential cmake libtool mercurial pkg-config && \
-                apt-get install docker.io && \
-                apt-get -qq update && \
+                apt-get -y install docker.io && \
                 apt-get install -y libsystemd-dev libc6-dev-arm64-cross gcc-aarch64-linux-gnu && \
                 mkdir -p $HOME/gopath/src/k8s.io && \
                 mv $TRAVIS_BUILD_DIR $HOME/gopath/src/k8s.io/node-problem-detector && \
